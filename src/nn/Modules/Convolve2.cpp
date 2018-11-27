@@ -16,13 +16,15 @@ namespace af
     {
         using namespace autograd;
 
-        Convolve2::Convolve2(int wx, int wy, int sx, int sy, int px, int py, int n_in, int n_out, bool bias) :
+        Convolve2::Convolve2(int wx, int wy, int sx, int sy, int px, int py, int dx, int dy, int n_in, int n_out, bool bias) :
             m_wx(wx),
             m_wy(wy),
             m_sx(sx),
             m_sy(sy),
             m_px(px),
             m_py(py),
+            m_dx(dx),
+            m_dy(dy),
             m_bias(bias)
         {
             auto w = nn::lecunNormal(dim4(wx, wy, n_in, n_out));
@@ -34,11 +36,13 @@ namespace af
             }
         }
 
-        Convolve2::Convolve2(const Variable &w, int sx, int sy, int px, int py) :
+        Convolve2::Convolve2(const Variable &w, int sx, int sy, int px, int py, int dx, int dy) :
             m_sx(sx),
             m_sy(sy),
             m_px(px),
             m_py(py),
+            m_dx(dx),
+            m_dy(dy),
             m_bias(false),
             Module({w})
         {
@@ -47,11 +51,13 @@ namespace af
             m_wy = pdims[1];
         }
 
-        Convolve2::Convolve2(const Variable &w, const Variable &b, int sx, int sy, int px, int py) :
+        Convolve2::Convolve2(const Variable &w, const Variable &b, int sx, int sy, int px, int py, int dx, int dy) :
             m_sx(sx),
             m_sy(sy),
             m_px(px),
             m_py(py),
+            m_dx(dx),
+            m_dy(dy),
             m_bias(true),
             Module({w, b})
         {
@@ -65,7 +71,7 @@ namespace af
 
         Variable Convolve2::forward(const Variable &input)
         {
-            auto res = convolve2(input, m_parameters[0], m_wx, m_wy, m_sx, m_sy, m_px, m_py);
+            auto res = convolve2(input, m_parameters[0], m_sx, m_sy, m_px, m_py, m_dx, m_dy);
             if (m_bias) {
                 res = res + tileAs(m_parameters[1], res);
             }

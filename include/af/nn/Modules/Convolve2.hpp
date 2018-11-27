@@ -24,12 +24,15 @@ namespace af
             int m_sy;
             int m_px;
             int m_py;
+            int m_dx;
+            int m_dy;
+
         public:
-            Convolve2(int wx, int wy, int sx, int sy, int px, int py, int n_in, int n_out, bool bias = true);
+            Convolve2(int wx, int wy, int sx, int sy, int px, int py, int dx, int dy, int n_in, int n_out, bool bias = true);
 
-            Convolve2(const autograd::Variable &w, int sx = 1, int sy = 1, int px = 0, int py = 0);
+            Convolve2(const autograd::Variable &w, int sx = 1, int sy = 1, int px = 0, int py = 0, int dx = 1, int dy = 1);
 
-            Convolve2(const autograd::Variable &w, const autograd::Variable &b, int sx = 1, int sy = 1, int px = 0, int py = 0);
+            Convolve2(const autograd::Variable &w, const autograd::Variable &b, int sx = 1, int sy = 1, int px = 0, int py = 0, int dx = 1, int dy = 1);
 
             autograd::Variable forward(const autograd::Variable &input);
         };
