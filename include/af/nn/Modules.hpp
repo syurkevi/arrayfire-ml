@@ -14,3 +14,4 @@
 #include <af/nn/Modules/Activations.hpp>
 #include <af/nn/Modules/Loss.hpp>
 #include <af/nn/Modules/Dropout.hpp>
+#include <af/nn/Modules/Convolve2.hpp>
