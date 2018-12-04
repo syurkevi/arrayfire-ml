@@ -136,7 +136,7 @@ TEST(Autograd, Sigmoid)
 /*
 TEST(Autograd, Softmax)
 {
-    auto x = Variable(af::randu(5), true);
+    auto x = Variable(af::randu(af::dim4(5, 2)), true);
     auto x1a = x.array();
     x1a(0) += 0.1;
     auto x1 = Variable(x1a, true);
@@ -252,4 +252,24 @@ TEST(Autograd, Mean)
     auto diffy = (dx.array() - af::mean(af::mean(y.array(), 1), 2));
     EXPECT_TRUE(allTrue<bool>(abs(diffx) < 1E-5));
     EXPECT_TRUE(allTrue<bool>(abs(diffy) < 1E-5));
+}
+
+TEST(Autograd, Conv2)
+{
+    auto x = Variable(af::randu(10, 10), true);
+    auto f = Variable(af::randu(3, 3), true);
+    af_print(f.array());
+    auto z = convolve2(x, f, 1, 1, 1, 1, 1, 1);
+    auto dz = Variable(af::constant(1.0, z.dims()), false);
+    z.backward(dz);
+    af_print(z.array());
+}
+
+TEST(Autograd, Pool2)
+{
+    auto x = Variable(af::randu(10, 10), true);
+    af_print(x.array());
+    auto z = maxpool2(x, 3, 3, 3, 3, 1, 1);
+    auto dz = Variable(af::range(z.dims()) + 1 + af::range(z.dims(), 1), false);
+    z.backward(dz);
 }

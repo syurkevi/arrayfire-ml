@@ -85,5 +85,12 @@ namespace af
             auto mask = input >= m_threshold;
             return input * mask;
         }
+
+        Softmax::Softmax() {}
+
+        Variable Softmax::forward(const Variable &input)
+        {
+            return softmax(input);
+        }
     }
 }

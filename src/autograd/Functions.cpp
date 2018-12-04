@@ -9,6 +9,9 @@
 
 #include <af/autograd/Variable.hpp>
 #include <af/autograd/Functions.hpp>
+#include<iostream>//TODO:remove
+using std::cout;//TODO:remove
+using std::endl;//TODO:remove
 
 namespace af {
     namespace autograd {
@@ -491,6 +494,33 @@ namespace af {
             array res = wrap(input.array(), ox, oy, wx, wy, sx, sy, px, py);
             auto grad_func = [wx, wy, sx, sy, px, py](std::vector<Variable> &inputs, const Variable &grad_output) {
                 inputs[0].addGrad(unwrap(grad_output, wx, wy, sx, sy, px, py));
+            };
+            return Variable(res, {input}, grad_func);
+        }
+
+        Variable maxpool2(const Variable &input, int wx, int wy, int sx, int sy, int px, int py) {
+            dim4 idims = input.dims();
+
+            //TODO: faster version using reshape for square pooling sizes
+            array unwrapped = unwrap(input.array(), wx, wy, sx, sy, px, py);
+            dim4 udims = unwrapped.dims();
+
+            array max_unwrapped, max_idx;
+            max(max_unwrapped, max_idx, unwrapped, 0);
+
+            dim_t outputWidth  = 1 + (idims[0] + 2 * px - wx) / sx;
+            dim_t outputHeight = 1 + (idims[1] + 2 * py - wy) / sy;
+
+            array res = moddims(max_unwrapped, dim4(outputWidth, outputHeight, idims[2], idims[3]));
+
+            auto grad_func = [udims, max_idx, wx, wy, sx, sy, px, py](std::vector<Variable> &inputs, const Variable &grad_output) {
+                array l_idx = flat(max_idx) + (range(udims[1]) * udims[0]);
+                array unwrapped_grad = constant(0, udims);
+                unwrapped_grad(l_idx) = flat(grad_output.array());
+
+                dim4 d = inputs[0].dims();
+                array grad = wrap(unwrapped_grad, d[0], d[1], wx, wy, sx, sy, px, py);
+                inputs[0].addGrad(Variable(grad, false));
             };
             return Variable(res, {input}, grad_func);
         }

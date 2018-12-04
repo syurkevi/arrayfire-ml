@@ -1,5 +1,5 @@
 /*******************************************************
- * Copyright (c) 2017, ArrayFire
+ * Copyright (c) 2018, ArrayFire
  * All rights reserved.
  *
  * This file is distributed under 3-clause BSD license.
@@ -9,11 +9,18 @@
 #pragma once
 
 #include <af/nn/Modules/Module.hpp>
-#include <af/nn/Modules/Linear.hpp>
-#include <af/nn/Modules/Container.hpp>
-#include <af/nn/Modules/Activations.hpp>
-#include <af/nn/Modules/Loss.hpp>
-#include <af/nn/Modules/Dropout.hpp>
-#include <af/nn/Modules/Convolve2.hpp>
-#include <af/nn/Modules/Pool2.hpp>
-#include <af/nn/Modules/Flatten.hpp>
+
+namespace af
+{
+    namespace nn
+    {
+        class Flatten : public Module
+        {
+        private:
+            bool batched_input_;
+        public:
+            Flatten(bool batched_input = true);
+            autograd::Variable forward(const autograd::Variable &input);
+        };
+    }
+}

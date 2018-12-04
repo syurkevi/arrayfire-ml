@@ -78,6 +78,14 @@ namespace af
             autograd::Variable forward(const autograd::Variable &input);
         };
 
+        class Softmax : public Module
+        {
+        public:
+            Softmax();
+
+            autograd::Variable forward(const autograd::Variable &input);
+        };
+
 
 
     }

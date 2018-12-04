@@ -17,6 +17,8 @@ target_sources(afml
   src/nn/Modules/Linear.cpp
   src/nn/Modules/Loss.cpp
   src/nn/Modules/Convolve2.cpp
+  src/nn/Modules/Pool2.cpp
+  src/nn/Modules/Flatten.cpp
   src/nn/Modules/Module.cpp
   src/nn/Modules/Dropout.cpp
   src/nn/Init.cpp

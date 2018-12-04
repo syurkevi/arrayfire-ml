@@ -10,6 +10,10 @@
 #include <af/nn/Init.hpp>
 #include <af/nn/Modules/Convolve2.hpp>
 //output will be ho x wo x no x n
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace af
 {
     namespace nn
@@ -67,6 +71,8 @@ namespace af
             dim4 pdims = w.dims();
             m_wx = pdims[0];
             m_wy = pdims[1];
+            dim_t n_out = b.dims()[0];
+            m_parameters[1] = moddims(m_parameters[1], af::dim4(1, 1, n_out, 1));
         }
 
         Variable Convolve2::forward(const Variable &input)
