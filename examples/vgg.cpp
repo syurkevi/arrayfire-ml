@@ -6,12 +6,10 @@
  * The complete license agreement can be obtained at:
  * http://arrayfire.com/licenses/BSD-3-Clause
  ********************************************************/
+
 #include <af/autograd.h>
 #include <af/nn.h>
-#include <iostream>
 
-using std::cout;
-using std::endl;
 using namespace af;
 using namespace af::nn;
 using namespace af::autograd;
@@ -168,12 +166,32 @@ int main()
     nn::Sequential vgg19 = vgg19_factory();
 
     Variable result;
-    timer::start();
+    result = vgg19.forward(nn::input(in));
+    auto loss = MeanSquaredError();
     const int iters = 10;
-    for(int i=0; i<iters; ++i)
+    printf("--------------\n");
+    printf("Forward passes\n");
+    printf("--------------\n");
+    for(int i=0; i<iters; ++i) {
+        timer::start();
         result = vgg19.forward(nn::input(in));
-    printf("elapsed seconds: %g\n", timer::stop() / (float)iters);
-    cout << result.array().dims() << endl;
+        af::sync();
+        printf("elapsed seconds: %g\n", timer::stop());
+    }
+
+    auto l = loss(result, nn::noGrad(out));
+    af_print(l.array());
+    l.backward();
+    af::sync();
+    printf("--------------\n");
+    printf("Backward passes\n");
+    printf("--------------\n");
+    for(int i=0; i<iters; ++i) {
+        timer::start();
+        l.backward();
+        af::sync();
+        printf("elapsed seconds: %g\n", timer::stop());
+    }
 
     return 0;
 }

@@ -9,9 +9,6 @@
 
 #include <af/autograd/Variable.hpp>
 #include <af/autograd/Functions.hpp>
-#include<iostream>//TODO:remove
-using std::cout;//TODO:remove
-using std::endl;//TODO:remove
 
 namespace af {
     namespace autograd {
@@ -273,17 +270,19 @@ namespace af {
 
         Variable softmax(const Variable &input)
         {
-            //todo: add axis to apply?
+            // TODO: add axis along which to apply softmax?
             auto exps = exp(input.array());
             auto result = exps / tile(sum(exps, 0), exps.dims(0));
             auto grad_func = [](std::vector<Variable> &inputs, const Variable &grad_output) {
                 auto exps = exp(inputs[0]);
                 auto tmp = exps / tileAs(sum(exps, {0}), exps);
+                tmp = moddims(tmp, af::dim4(tmp.dims()[0], 1, tmp.dims()[1]));
 
                 auto ps_j = tile(tmp, { 1, (int)tmp.dims()[0] } );
                 auto ps_i = transpose(tile(tmp, {1,(int)tmp.dims()[0] } ));
-                Variable I(identity((int)tmp.dims()[0], (int)tmp.dims()[0]), false);
+                Variable I(identity((dim_t)tmp.dims()[0], (dim_t)tmp.dims()[0], (dim_t)tmp.dims()[2]), false);
                 auto jac = (sum(ps_i * (I - ps_j), { 1 }));
+                jac = moddims(jac, inputs[0].dims());
                 inputs[0].addGrad(grad_output * jac);
             };
             return Variable(result, {input}, grad_func);
@@ -501,7 +500,7 @@ namespace af {
         Variable maxpool2(const Variable &input, int wx, int wy, int sx, int sy, int px, int py) {
             dim4 idims = input.dims();
 
-            //TODO: faster version using reshape for square pooling sizes
+            // TODO: faster version using reshape for square pooling sizes
             array unwrapped = unwrap(input.array(), wx, wy, sx, sy, px, py);
             dim4 udims = unwrapped.dims();
 
@@ -514,7 +513,14 @@ namespace af {
             array res = moddims(max_unwrapped, dim4(outputWidth, outputHeight, idims[2], idims[3]));
 
             auto grad_func = [udims, max_idx, wx, wy, sx, sy, px, py](std::vector<Variable> &inputs, const Variable &grad_output) {
-                array l_idx = flat(max_idx) + (range(udims[1]) * udims[0]);
+                af::dim4 mdims = max_idx.dims();
+
+                //figure out linear indices of maximum values in unwrapped array
+                array l_idx = moddims(max_idx, af::dim4(mdims[0] * mdims[1], 1, mdims[2], mdims[3]));
+                l_idx += (range(udims[1], 1, mdims[2], mdims[3]) * udims[0]);
+                l_idx += range(udims[1], 1, mdims[2], mdims[3], 2) * (udims[0] * udims[1]);
+                l_idx += range(udims[1], 1, mdims[2], mdims[3], 3) * (udims[0] * udims[1] * udims[2]);
+
                 array unwrapped_grad = constant(0, udims);
                 unwrapped_grad(l_idx) = flat(grad_output.array());
 

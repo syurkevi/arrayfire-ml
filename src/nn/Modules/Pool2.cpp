@@ -23,15 +23,7 @@ namespace af
             m_sy(sy),
             m_px(px),
             m_py(py)
-        {
-            //auto w = nn::lecunNormal(dim4(wx, wy, n_in, n_out));
-            //if (bias) {
-                //auto b = nn::lecunNormal(dim4(1, 1, n_out, 1));
-                //setParams({w, b});
-            //} else {
-                //setParams({w});
-            //}
-        }
+        {}
 
         Variable Pool2::forward(const Variable &input)
         {
