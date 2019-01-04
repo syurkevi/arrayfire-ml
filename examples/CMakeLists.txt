@@ -1,8 +1,12 @@
+find_package(Boost COMPONENTS system filesystem REQUIRED)
+
 function(build_example SRC)
   get_filename_component(src_name ${SRC} NAME_WE)
   set(target "${src_name}")
   add_executable(${target} ${SRC})
   target_link_libraries(${target}
+    PUBLIC
+    ${Boost_LIBRARIES}
     PRIVATE
     afml
     )
@@ -15,4 +19,5 @@ endfunction(build_example)
 # build_example(Node.cpp)
 build_example(xor.cpp)
 build_example(vgg.cpp)
+build_example(catdog.cpp)
 # build_example(Weights.cpp)
