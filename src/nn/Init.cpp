@@ -93,7 +93,7 @@ namespace af {
             dim_t elements = dims.elements();
             dim_t fan_in = elements / dims[1];
             double stdv = ::sqrt(1.0/(double)fan_in);
-            return nn::normal(dims, 0, stdv, type, calc_grad);
+            return nn::normal(dims, stdv, 0, type, calc_grad);
         }
 
         autograd::Variable glorotUniform(int output_size, int input_size,
@@ -126,7 +126,7 @@ namespace af {
             dim_t fan_in = elements / dims[1];
             dim_t fan_out = elements / dims[0];
             double stdv = ::sqrt(2.0/(double)(fan_in + fan_out));
-            return nn::normal(dims, 0, stdv, type, calc_grad);
+            return nn::normal(dims, stdv, 0, type, calc_grad);
         }
 
         autograd::Variable constant(double val, int output_size, int input_size,

@@ -154,8 +154,8 @@ TEST(Autograd, Softmax)
 
     auto dx = x.grad();
 
-    EXPECT_TRUE(abs((x.dims()[1] * 1.0) - sum<double>(y.array())) < 1E-5);
-    EXPECT_TRUE(abs(sum<double>(dx.array())) < 1E-5);
+    EXPECT_TRUE(std::abs((x.dims()[1] * 1.0) - sum<double>(y.array())) < 1E-5);
+    EXPECT_TRUE(std::abs(sum<double>(dx.array())) < 1E-5);
 }
 
 TEST(Autograd, assign)
